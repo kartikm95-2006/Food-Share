@@ -1,7 +1,7 @@
 import React from 'react';
 import StatusBadge from './StatusBadge';
 import ExpiryTimer from './ExpiryTimer';
-import { MapPin, User, Utensils, ArrowRight, HeartHandshake, CheckCircle } from 'lucide-react';
+import { MapPin, User, Utensils, ArrowRight, HeartHandshake, CheckCircle, Truck, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function DonationCard({ donation, onClaim, onViewDetails, onUpdateStatus }) {
@@ -11,7 +11,6 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
   const isDonor = user?.role === 'donor';
   const isAdmin = user?.role === 'admin';
   const isOwner = user?.id === donation.donor_id;
-
   const isClaimedByMe = donation.ngo_id === user?.id;
 
   const typeLabels = {
@@ -50,7 +49,6 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
           }}
           loading="lazy"
           onError={(e) => {
-            // fallback
             e.target.src = 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=80';
           }}
         />
@@ -157,14 +155,14 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
           </div>
 
           {donation.ngo_name && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6', fontWeight: 600 }}>
               <HeartHandshake size={13} />
               <span>Claimed by: {donation.ngo_org || donation.ngo_name}</span>
             </div>
           )}
         </div>
 
-        {/* Action Button Footer */}
+        {/* Segregated Action Footer */}
         <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)', display: 'flex', gap: '8px', alignItems: 'center' }}>
           
           <button
@@ -176,8 +174,8 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
             <ArrowRight size={13} />
           </button>
 
-          {/* If NGO and food is available -> Claim Button */}
-          {donation.status === 'available' && (isNgo || isAdmin) && (
+          {/* NGO ONLY: Claim Available Food */}
+          {isNgo && donation.status === 'available' && (
             <button
               onClick={() => onClaim(donation)}
               className="btn btn-primary btn-sm"
@@ -188,19 +186,20 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
             </button>
           )}
 
-          {/* If NGO and food is claimed -> Picked up button */}
-          {donation.status === 'claimed' && (isClaimedByMe || isAdmin) && (
+          {/* NGO ONLY: Pick Up Claimed Food */}
+          {isNgo && donation.status === 'claimed' && isClaimedByMe && (
             <button
               onClick={() => onUpdateStatus(donation.claim_id, 'picked_up')}
               className="btn btn-accent btn-sm"
               style={{ flex: 1.2, fontSize: '0.82rem' }}
             >
-              <span>Picked Up 🚚</span>
+              <Truck size={14} />
+              <span>Picked Up</span>
             </button>
           )}
 
-          {/* If NGO and food is picked up -> Complete button */}
-          {donation.status === 'picked_up' && (isClaimedByMe || isAdmin) && (
+          {/* NGO ONLY: Complete Delivered Food */}
+          {isNgo && donation.status === 'picked_up' && isClaimedByMe && (
             <button
               onClick={() => onUpdateStatus(donation.claim_id, 'completed')}
               className="btn btn-primary btn-sm"
@@ -208,6 +207,34 @@ export default function DonationCard({ donation, onClaim, onViewDetails, onUpdat
             >
               <CheckCircle size={14} />
               <span>Complete 🎉</span>
+            </button>
+          )}
+
+          {/* DONOR ONLY: Status information indicator */}
+          {isDonor && isOwner && (
+            <div
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: donation.status === 'available' ? '#10b981' : donation.status === 'claimed' ? '#f59e0b' : '#8b5cf6',
+                background: 'var(--bg-surface-elevated)',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
+              {donation.status === 'available' ? '🟢 Listed' : donation.status === 'claimed' ? '🚚 NGO En Route' : '🟣 Delivered'}
+            </div>
+          )}
+
+          {/* ADMIN ONLY: Full Override button */}
+          {isAdmin && donation.status === 'available' && (
+            <button
+              onClick={() => onClaim(donation)}
+              className="btn btn-primary btn-sm"
+              style={{ flex: 1.2, fontSize: '0.82rem', background: '#f59e0b' }}
+            >
+              <span>Test Claim</span>
             </button>
           )}
 

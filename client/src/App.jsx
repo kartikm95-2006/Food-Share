@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import QuickDemoBar from './components/QuickDemoBar';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import ExplorePage from './pages/ExplorePage';
@@ -45,14 +44,13 @@ function MainApp() {
     try {
       await claimsApi.updateStatus(claimId, newStatus);
       showToast(`Status updated to ${newStatus === 'picked_up' ? 'Picked Up 🚚' : 'Delivered & Completed 🎉'}`);
-      // trigger rerender
       setActiveTab((prev) => prev);
     } catch (err) {
       alert(err.message || 'Failed to update status');
     }
   };
 
-  // Render current page content
+  // Render current page content based on segregated tab
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -124,24 +122,24 @@ function MainApp() {
       <footer
         style={{
           borderTop: '1px solid var(--border-subtle)',
-          padding: '30px 20px',
+          padding: '28px 20px',
           background: 'var(--bg-surface)',
           textAlign: 'center',
-          fontSize: '0.85rem',
+          fontSize: '0.84rem',
           color: 'var(--text-dim)'
         }}
       >
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>FoodShare Platform</span>
+            <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>FoodShare Community Platform</span>
             <span>•</span>
             <span>Web and Mobile Development (WMD) Laboratory Project</span>
           </div>
           <div>
-            Built with <strong>React + Vite + Node.js Express + SQLite3</strong> • Designed for zero-waste community nutrition.
+            Built with <strong>React + Vite + Node.js Express + SQLite3</strong> • Zero-Waste Surplus Food Rescue
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Developed by Kartik Mahindrakar • Mumbai University WMD Syllabus Implementation
+            Developed by Kartik Mahindrakar • CSE (AIML)
           </div>
         </div>
       </footer>
@@ -150,10 +148,8 @@ function MainApp() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Demo Switcher & Controller */}
-      <QuickDemoBar />
-
-      {/* View Mode Switching: Responsive Web or Simulated Smartphone Bezel */}
+      
+      {/* Device Mode: Simulated Smartphone Bezel or Full Responsive Web */}
       {viewMode === 'mobile_frame' ? (
         <div className="device-frame-container">
           <div className="smartphone-frame">
@@ -168,7 +164,7 @@ function MainApp() {
         AppContent
       )}
 
-      {/* Toast Notification Notification Pill */}
+      {/* Toast Notification Pill */}
       {toastMessage && (
         <div
           style={{
